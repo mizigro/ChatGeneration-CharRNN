@@ -36,6 +36,15 @@
                 float:left;
                 border:1px solid #555;
             }
+            .typing{
+                height:28px;
+                vertical-align:middle;
+                line-height: 28px;
+                position:relative;
+                float:left;
+                margin-right:10px;
+                margin-left:10px;
+            }
         </style>
     </head>
     <body>
@@ -64,6 +73,8 @@
                 let txtBuffer = ''
                 let curUser = 0
 
+                messenger.append(typingDiv(curUser == 0))
+
                 const model = await tf.loadLayersModel(config.model_path)
                 
                 for(let i=0;i<samples;i++){
@@ -82,11 +93,15 @@
 
                             let newUser = config.users.indexOf(usr)
                             console.log(config.users, usr, curUser)                    
+                            
+                            messenger.children().last().remove()
 
                             if(txtBuffer.trim().length > 0)
                                 messenger.append(newChatDiv(curUser == 0, txtBuffer));
                             txtBuffer = '';
                             curUser = newUser;
+                            messenger.append(typingDiv(curUser == 0))
+
                         }
                     })
                     
@@ -94,6 +109,14 @@
                     input = tf.tensor([[idx]]);
                     curChar = config.i2c[idx];
                 }
+            }
+
+            function getImgUrl(){
+                return 'static/images/loading.gif?' + Math.random()
+            }
+
+            function typingDiv(isMe){
+                return '<div class="chat_container" style="padding:0px;"><div class="chat '+(isMe?'me':'you')+'"><div class="typing">Typing</div> <img height="30px" src="'+getImgUrl()+'"></div></div>'
             }
 
             function newChatDiv(isMe, txt){
