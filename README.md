@@ -5,4 +5,4 @@ Char-RNN model run on dialogue between Socrates and Euthyphro (Plato's "Euthyphr
 
 ## Sample Text Conversation
 
-<img src="https://github.com/mizigro/ChatMessenger-CharRNN/raw/master/Server/sample.png" width="60%">
+<img src="https://github.com/mizigro/ChatMessenger-CharRNN/raw/master/Server/sample.png" width="100%">
