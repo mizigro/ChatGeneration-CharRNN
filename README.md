@@ -7,6 +7,10 @@ Char-RNN model run on dialogue between <a href="https://github.com/mizigro/ChatG
 
 <img src="https://github.com/mizigro/ChatMessenger-CharRNN/raw/master/Server/sample.png" width="100%">
 
+## Running the Server
+
+Install `Flask (Python)`. Run `export FLASK_APP=app.py` and `flask run` on the terminal, open the link in a browser and enjoy!
+
 ## Training 
 
 For training on a different conversation, first collect a conversation file similar to the format given in `conversation.txt` file in the data folder. 
@@ -15,7 +19,7 @@ Run `python3 train.py path/to/text/file --model_name model/name` using `train.py
 
 Test the model using `python3 test.py model/folder/path --samples 3000`. The samples argument specifies the number of characters to predict.
 
-## Using the model on Server
+## Moving trained model to Server
 
 Generate TensorflowJS files using `tensorflowjs_converter --input_format keras path/to/model.h5 target/dir/path` to convert the model for the server app *(TensorflowJS may required use of virtualenv due to version conflicts in the dependencies)*.
 
@@ -23,6 +27,4 @@ Copy the `model.json` file generated, alongwith the `c2i.json` and `i2c.json` fi
 
 Specify the path to those files in the `model.options.json` file found inside the `static` folder. Also, specify all the users' names as used in the conversation text. You can even modify the number of character samples to be generated as well as the initial character used for prediction.
 
-## Running the Server
-
-Install `Flask (Python)`. Run `export FLASK_APP=app.py` and `flask run` on the terminal, open the link in a browser and enjoy!
+Run the sever as described before.
