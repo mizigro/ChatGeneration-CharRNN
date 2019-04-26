@@ -1,6 +1,6 @@
 # Messenger Chat Generation (Char-RNN Model)
 
-Char-RNN model run on dialogue between Socrates and Euthyphro (Plato's "Euthyphro")
+Char-RNN model run on dialogue between <a href="https://github.com/mizigro/ChatGeneration-CharRNN/raw/master/Training/data/conversation.txt">Socrates and Euthyphro (Plato's "Euthyphro") </a>
 
 
 ## Sample Text Conversation
