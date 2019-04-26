@@ -29,7 +29,7 @@ if __name__=='__main__':
     if not os.path.exists(i2c_path):
         raise FileNotFoundError(i2c_path)
     if not os.path.exists(model_path):
-        raise FileExistsError(model_path)
+        raise FileNotFoundError(model_path)
 
     model = load_model(model_path)
     c2i = json.loads(open(c2i_path,'r').readlines()[0])
