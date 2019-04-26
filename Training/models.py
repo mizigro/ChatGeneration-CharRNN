@@ -29,5 +29,9 @@ def get_char_rnn_model(batch_size, seq_len, lstm_cell_size, vocab_size):
     return model
 
 
+
+# Final_model to be saved:
+#   * Processes in single batches
+#   * Accepts single character as sequence input
 def get_final_model(lstmSize, vocab_size):
     return get_char_rnn_model(1, 1, lstmSize, vocab_size)

@@ -7,16 +7,18 @@ MODEL_WEIGHT_FILE_NAME = 'weights.h5'
 MODEL_C2I_NAME = 'c2i.json' # char to idx
 MODEL_I2C_NAME = 'i2c.json' # idx to char
 
+# save object in json format
 def save_json(obj, path):
     open(path,'w').write(json.dumps(obj))
 
-def train(txt, model_dir, new_train):
+def train(txt, model_dir, replace):
     lstm_cell_size = 256
     steps_per_epoch = 200
     seq_len = 100
     batch_size = 32
     epochs = 10
 
+    # reject text if too small
     if len(txt) < steps_per_epoch * (seq_len + 1):
         raise AssertionError('Too few texts in file :'+str(len(txt))+' Decrease steps_per_epoch : '+str(steps_per_epoch)+' and seq_len : '+str(seq_len))
 
@@ -33,25 +35,22 @@ def train(txt, model_dir, new_train):
     save_json(vocab.c2i, c2i_path) 
     save_json(vocab.i2c, i2c_path) 
 
-
-    # already present raises error
-    # if new_train and os.path.exists(model_dir):
-    #     raise OSError('\''+model_dir + '\' already exists! Remove folder or specify another model name to run.')
-
     # get model architectures
     model = models.get_char_rnn_model(batch_size, seq_len, lstm_cell_size, vocab_size)
     final_model = models.get_final_model(lstm_cell_size, vocab_size)
 
-    if not new_train:
-        # Load saved weights
+    if not replace:
+        # Try reusing saved weights
         try:
             model.load_weights(model_wt_path)
-            print('\nInitial weights found. Reusing weights.')
+            print('\nModel already exists. Reusing weights.')
         except OSError:
-            print('\nInitial model weights not found! Ignoring ...')
+            print('\nNo existing models found. Training new model ...')
     
+    # text data generator
     data_generator = vocab.new_data_generator(batch_size, steps_per_epoch, seq_len)
 
+    # final training phase
     for epoch in range(epochs):
         model.reset_states()
         print('Epoch: ', epoch+1)
@@ -68,7 +67,7 @@ if __name__=='__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('text_file_path',help='Path to text file')
     parser.add_argument('-m','--model_name',type=str, help='Specify the name for the model saved')
-    parser.add_argument('-n','--new',action='store_true', help='To train a new model reusing any old weights')
+    parser.add_argument('-r','--replace',action='store_true', help='To replace existing model data')
 
     args = parser.parse_args()
 
@@ -87,7 +86,8 @@ if __name__=='__main__':
     if not os.path.exists(model_dir):
         os.makedirs(model_dir)
 
-    # training phase
+    # get text data from file
     txt = ''.join(open(args.text_file_path,'r',errors='ignore').readlines())
 
-    train(txt, model_dir, new_train = args.new)
+    # training phase
+    train(txt, model_dir, replace = args.replace)
