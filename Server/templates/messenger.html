@@ -53,55 +53,60 @@
                 runPredictions()
             })
 
-            function getNextChar(curChar, probs){
-                if(curChar == '\n' || curChar == ' ')
-                    return randomChoices(probs, 1)[0];
-                else 
-                    return argmax(probs);
-            }
-
             async function runPredictions(){
-                var config = await $.get('static/model.config.json')
+                // load config options
+                var config = await $.get('static/model.options.json')
                 let messenger = $('#txt')
                 
+                // load vocab dictionaries
                 config.c2i = await $.ajax(config.c2i_path)
                 config.i2c = await $.ajax(config.i2c_path)
 
-                let samples = 3000;
-                let curChar = 'I'
+                let curChar = config.first_character[0]
                 let input = tf.tensor([[config.c2i[curChar]]])
                 let txtBuffer = ''
-                let curUser = 0
-
-                messenger.append(typingDiv(curUser == 0))
-
-                const model = await tf.loadLayersModel(config.model_path)
+                let curUserId = 0
                 
-                for(let i=0;i<samples;i++){
-
-                    let prediction = await model.predictOnBatch(input).array();
-                    let idx = getNextChar(curChar, prediction[0][0])
+                // show model loading text
+                messenger.append(newChatDiv(curUserId == 0, 'Loading Model ...'))
+                // load the lstm model
+                const model = await tf.loadLayersModel(config.model_path)
+                // on load, remove loading text
+                messenger.children().last().remove()
+                
+                // show typing icon
+                messenger.append(typingDiv(curUserId == 0))
+                
+                for(let i=0;i<parseInt(config.samples);i++){
+                    // predict next char probabilities
+                    // and get next char 
+                    let probs = (await model.predictOnBatch(input).array())[0][0];
+                    let idx = getNextChar(curChar, probs)
                     
-                    // console.log(curChar)
+                    // add character to 
+                    // text buffer
                     txtBuffer += config.i2c[idx]
                     // console.log(txtBuffer)
-
-                    let match = false;
+                    
+                    // check if user changes
                     config.users.forEach((usr)=>{
+                        // new user string match with config.users
                         if(txtBuffer.endsWith(usr)){
-                            txtBuffer = txtBuffer.slice(0, -usr.length)
-
-                            let newUser = config.users.indexOf(usr)
-                            console.log(config.users, usr, curUser)                    
+                            // remove user name from chat text
+                            txtBuffer = txtBuffer.slice(0, -usr.length)                
                             
+                            // remove typing div
                             messenger.children().last().remove()
-
+                            
+                            // if chat is not empty
+                            // append new chat div
                             if(txtBuffer.trim().length > 0)
-                                messenger.append(newChatDiv(curUser == 0, txtBuffer));
-                            txtBuffer = '';
-                            curUser = newUser;
-                            messenger.append(typingDiv(curUser == 0))
+                                messenger.append(newChatDiv(curUserId == 0, txtBuffer));
 
+                            // reset text buffer
+                            txtBuffer = '';
+                            curUserId = config.users.indexOf(usr); // get index of new user
+                            messenger.append(typingDiv(curUserId == 0))
                         }
                     })
                     
@@ -109,37 +114,63 @@
                     input = tf.tensor([[idx]]);
                     curChar = config.i2c[idx];
                 }
-            }
 
-            function getImgUrl(){
-                return 'static/images/loading.gif?' + Math.random()
+                // prediction finished
+                // remove typing div
+                messenger.children().last().remove()
             }
-
+            
+            // return next character 
+            // given the probabilies
+            function getNextChar(curChar, probs){
+                if(curChar == '\n' || curChar == ' ')
+                    return randomChoices(probs, 1)[0];
+                else 
+                    return argmax(probs);
+            }
+            
+            // return ' typing ... ' 
+            // div for given user
             function typingDiv(isMe){
-                return '<div class="chat_container" style="padding:0px;"><div class="chat '+(isMe?'me':'you')+'"><div class="typing">Typing</div> <img height="30px" src="'+getImgUrl()+'"></div></div>'
+                return '<div class="chat_container" style="padding:0px;">'+
+                            '<div class="chat '+ ( isMe ? 'me' : 'you' ) + '">'+
+                                '<div class="typing">Typing</div> '+
+                                '<img height="30px" src="static/images/loading.gif?">'+
+                            '</div>'+
+                        '</div>'
             }
-
+            
+            // return new normal chat 
+            // div for given user
             function newChatDiv(isMe, txt){
                 return '<div class="chat_container"><div class="chat '+(isMe?'me':'you')+'">'+txt+'</div></div>'
             }
-
+            
+            // helper for randomChoices
             function randomChoice(p) {
                 let rnd = p.reduce( (a, b) => a + b ) * Math.random();
                 return p.findIndex( a => (rnd -= a) < 0 );
             }
-
+            
+            // similar to np.random.choices
             function randomChoices(p, count) {
                 return Array.from(Array(count), randomChoice.bind(null, p));
             }
-
+            
+            // convert char array 
+            // to idx array
             function C2I(arr){
                 return arr.split('').map((c)=>(c2i[c]))
             }
-
+            
+            // get index of maximum 
+            // element in array
             function argmax(arr){
                 return arr.indexOf(Math.max.apply(Math, arr))
             }
-
+            
+            // convert idx array 
+            // to char array
             function I2C(arr){
                 return arr.map((ii)=>(i2c[ argmax( ii )]))
             }
