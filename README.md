@@ -9,7 +9,7 @@ Char-RNN model run on dialogue between <a href="https://github.com/mizigro/ChatG
 
 ## Running the Server
 
-Install `Flask (Python)`. Run `export FLASK_APP=app.py` and `flask run` on the terminal, open the link in a browser and enjoy!
+Install `Flask (Python)`. Go to the `Server`folder and run `export FLASK_APP=app.py` and `flask run` on the terminal, open the link in a browser and enjoy!
 
 ## Training 
 
