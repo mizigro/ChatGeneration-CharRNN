@@ -1,11 +1,11 @@
 # Messenger Chat Generation (Char-RNN Model)
 
-Char-RNN model run on dialogue between <a href="https://github.com/mizimo/ChatGeneration-CharRNN/raw/master/Training/data/conversation.txt">Socrates and Euthyphro (Plato's "Euthyphro") </a>
+Char-RNN model run on dialogue between <a href="https://raw.githubusercontent.com/mizimo/ChatGeneration-CharRNN/master/Training/data/conversation.txt">Socrates and Euthyphro (Plato's "Euthyphro") </a>
 
 
 ## Sample Text Conversation
 
-<img src="https://github.com/mizimo/ChatMessenger-CharRNN/raw/master/Server/sample.png" width="100%">
+<img src="https://raw.githubusercontent.com/mizimo/ChatGeneration-CharRNN/master/Server/sample.png" width="100%">
 
 ## Running the Server
 
